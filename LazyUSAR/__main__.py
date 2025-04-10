@@ -18,7 +18,7 @@ class UI:
         keyboard.hook(self.on_key_event)
 
         self.temp = jumping_jacks.JumpingJackController(
-            500, 1, 10, jumping_jacks.JumpingJackType.UPPERCASE, True, False
+            500, 1, 10, jumping_jacks.JumpingJackType.UPPERCASE, "!", False
         )
         self.temp.start()
         self.block_until_stopped()
@@ -36,7 +36,10 @@ class UI:
 
 
 def main():
-    UI("f6")
+    try:
+        UI("f6")
+    except KeyboardInterrupt:
+        return
 
 
 if __name__ == "__main__":

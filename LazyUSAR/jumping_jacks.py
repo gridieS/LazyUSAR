@@ -46,7 +46,7 @@ NUMBER_TO_WORDS = {
 }
 
 
-def number_to_word(num: int, exclamation: bool, hyphebed: bool) -> str:
+def number_to_word(num: int, hyphebed: bool, end_of_word: str) -> str:
     num_in_words = ""
     if abs(num) < 20:
         num_in_words = NUMBER_TO_WORDS[abs(num)]
@@ -69,10 +69,9 @@ def number_to_word(num: int, exclamation: bool, hyphebed: bool) -> str:
 
     if num < 0:
         num_in_words = "minus " + num_in_words
-    if exclamation:
-        num_in_words += "!"
     if hyphebed:
         num_in_words = num_in_words.replace(" ", "-")
+    num_in_words += end_of_word
     return num_in_words
 
 
@@ -92,8 +91,8 @@ class JumpingJackType(Enum):
     NUMBER = 4
     GRAMMAR = 5
 
-    def generator(self, num, exclamation: bool, hyphened: bool):
-        self.exclamation = exclamation
+    def generator(self, num, hyphened: bool, end_of_word: str):
+        self.end_of_word = end_of_word
         self.hyphened = hyphened
         if self is JumpingJackType.UPPERCASE:
             self._generator_uppercase(num)
@@ -114,31 +113,30 @@ class JumpingJackType(Enum):
 
     def _generator_uppercase(self, count: int) -> str:
         self._default_jumping_jack(
-            number_to_word(count, self.exclamation, self.hyphened).upper()
+            number_to_word(count, self.hyphened, self.end_of_word).upper()
         )
 
     def _generator_lowercase(self, count: int) -> str:
         self._default_jumping_jack(
-            number_to_word(count, self.exclamation, self.hyphened).lower()
+            number_to_word(count, self.hyphened, self.end_of_word).lower()
         )
 
     def _generator_grammar(self, count: int) -> str:
         self._default_jumping_jack(
-            number_to_word(count, self.exclamation, self.hyphened).capitalize()
+            number_to_word(count, self.hyphened, self.end_of_word).capitalize()
         )
 
     def _generator_helljack(self, count: int) -> str:
-        iterable = list(number_to_word(count, False, False).replace(" ", ""))
+        iterable = list(number_to_word(count, False, "").replace(" ", ""))
         for i in iterable:
             send_roblox_message(i)
             system_controller.press("space")
-        send_roblox_message(number_to_word(count, self.exclamation, self.hyphened))
+        send_roblox_message(number_to_word(count, self.hyphened, self.end_of_word))
         system_controller.press("space")  # On linux, this gets blocked often.
 
     def _generator_number(self, count: int) -> str:
-        if self.exclamation:
-            count += "!"
-        self._default_jumping_jack(str(count))
+        num_str = str(count + self.end_of_word)
+        self._default_jumping_jack(num_str)
 
 
 class JumpingJackController:
@@ -148,7 +146,7 @@ class JumpingJackController:
         starting_jj: int,  # Including
         ending_jj: int,
         jj_type: JumpingJackType,
-        exclamation: bool,
+        end_of_word: str,
         hyphened: bool,
         step=1,
     ):
@@ -156,7 +154,7 @@ class JumpingJackController:
         self.starting_jj = starting_jj
         self.ending_jj = ending_jj
         self.__jj_type = jj_type
-        self.exclamation = exclamation
+        self.end_of_word = end_of_word
         self.hyphened = hyphened
         self.counter = counter_types.ControlledIntervaledCounter(
             self._perform_jumping_jack,
@@ -177,7 +175,7 @@ class JumpingJackController:
         return self.__jj_type
 
     def _perform_jumping_jack(self, count: int):
-        self.__jj_type.generator(count, self.exclamation, self.hyphened)
+        self.__jj_type.generator(count, self.hyphened, self.end_of_word)
         if count >= self.ending_jj:
             self.exit()
 
