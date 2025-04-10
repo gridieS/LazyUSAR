@@ -140,10 +140,10 @@ class JumpingJackType(Enum):
 
 
 class JumpingJackController:
-    def __init__(
+    def _initialize(
         self,
-        interval: int,  # Milliseconds
-        starting_jj: int,  # Including
+        interval: int,
+        starting_jj: int,
         ending_jj: int,
         jj_type: JumpingJackType,
         end_of_word: str,
@@ -164,6 +164,34 @@ class JumpingJackController:
             "k",
             "l",
             step,
+        )
+
+    def __init__(
+        self,
+        interval: int,  # Milliseconds
+        starting_jj: int,  # Including
+        ending_jj: int,
+        jj_type: JumpingJackType,
+        end_of_word: str,
+        hyphened: bool,
+        step=1,
+    ):
+        self._initialize(
+            interval, starting_jj, ending_jj, jj_type, end_of_word, hyphened, step
+        )
+
+    def remake(
+        self,
+        interval: int,
+        starting_jj: int,
+        ending_jj: int,
+        jj_type: JumpingJackType,
+        end_of_word: str,
+        hyphened: bool,
+        step=1,
+    ):
+        self._initialize(
+            interval, starting_jj, ending_jj, jj_type, end_of_word, hyphened, step
         )
 
     def set_jj_type(self, jj_type: JumpingJackType):
