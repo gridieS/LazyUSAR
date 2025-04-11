@@ -207,16 +207,14 @@ class JumpingJackController:
         if count >= self.ending_jj:
             self.exit()
 
-    def start(self):
+    def reset(self):
         self.counter.reset()
+
+    def start(self):
         self.counter.start()
 
     def stop(self):
-        self.counter.exit()
-
-    def resume(self):
-        self.counter.start()
+        self.exit()
 
     def exit(self):
-        self.counter.reset()
         self.counter.exit()
