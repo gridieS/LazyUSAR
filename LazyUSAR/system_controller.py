@@ -12,6 +12,8 @@ if IS_WINDOWS:
 
     pdi.PAUSE = DELAY_MS / 1000 / 2
 
+running = True
+
 
 def _run_cmd(cmd: list[str]):
     """Run a shell command quietly."""
@@ -62,6 +64,8 @@ WINDOWS_SPECIAL_CHARACTERS = {
 
 def write(text: str) -> None:
     """Type out a string of text."""
+    if not running:
+        return
     if IS_WINDOWS:
         special_keys = WINDOWS_SPECIAL_CHARACTERS.keys()
         for char in text:
@@ -78,6 +82,8 @@ def write(text: str) -> None:
 
 def press(key: str) -> None:
     """Press and release a key."""
+    if not running:
+        return
     if IS_WINDOWS:
         pdi.press(key)
     elif IS_LINUX:
@@ -88,6 +94,8 @@ def press(key: str) -> None:
 
 def hold(key: str) -> None:
     """Hold down a key."""
+    if not running:
+        return
     if IS_WINDOWS:
         pdi.keyDown(key)
     elif IS_LINUX:
@@ -96,6 +104,8 @@ def hold(key: str) -> None:
 
 def release(key: str) -> None:
     """Release a held key."""
+    if not running:
+        return
     if IS_WINDOWS:
         pdi.keyUp(key)
     elif IS_LINUX:

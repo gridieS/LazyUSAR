@@ -211,10 +211,12 @@ class JumpingJackController:
         self.counter.reset()
 
     def start(self):
+        system_controller.running = True
         self.counter.start()
 
     def stop(self):
         self.exit()
 
     def exit(self):
+        system_controller.running = False
         self.counter.exit()
