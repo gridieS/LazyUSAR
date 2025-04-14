@@ -21,12 +21,15 @@ class ControlledCounter:
         self.count = self.start_count
         self.step = step
         self.listener_hook = None
+        self.is_listening = False
 
     def reset(self):
         self.count = self.start_count
 
     def start(self):
-        self.listener_hook = keyboard.hook(self.on_key_event)
+        if not self.is_listening:
+            self.is_listening = True
+            self.listener_hook = keyboard.hook(self.on_key_event)
 
     def on_key_event(self, key: keyboard.KeyboardEvent):
         if key.event_type != "down":  # Only on key down events
@@ -42,6 +45,7 @@ class ControlledCounter:
     def exit(self):
         if self.listener_hook is not None:
             keyboard.unhook(self.listener_hook)
+        self.is_listening = False
         self.listener_hook = None
 
 
@@ -91,4 +95,5 @@ class ControlledIntervaledCounter(ControlledCounter):
         if self.listener_hook is not None:
             keyboard.unhook(self.listener_hook)
         self.listener_hook = None
+        self.is_listening = False
         self.running = False
