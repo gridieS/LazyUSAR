@@ -87,7 +87,7 @@ def send_roblox_message(message: str):
 class JumpingJackType(Enum):
     UPPERCASE = 1
     LOWERCASE = 2
-    HELLJACK = 3
+    HELL = 3
     NUMBER = 4
     GRAMMAR = 5
 
@@ -98,7 +98,7 @@ class JumpingJackType(Enum):
             self._generator_uppercase(num)
         elif self is JumpingJackType.LOWERCASE:
             self._generator_lowercase(num)
-        elif self is JumpingJackType.HELLJACK:
+        elif self is JumpingJackType.HELL:
             self._generator_helljack(num)
         elif self is JumpingJackType.NUMBER:
             self._generator_number(num)
