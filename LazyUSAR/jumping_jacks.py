@@ -207,6 +207,7 @@ class JumpingJackController:
     def _perform_jumping_jack(self, count: int):
         if count > self.ending_jj:
             self.exit()
+            self.reset()
         self.__jj_type.generator(count, self.hyphened, self.end_of_word)
 
     def reset(self):
