@@ -62,14 +62,14 @@ class ControlledIntervaledCounter(ControlledCounter):
             callback, start_count, backward_key, toggle_key, forward_key, step
         )
 
-    def set_interval(self):
+    def _set_interval(self):
         if self.running:
             self.callback(self.count)
             self.count += self.step
-            self.timer = Timer(self.interval / 1000, self.set_interval)
+            self.timer = Timer(self.interval / 1000, self._set_interval)
             self.timer.start()
 
-    def stop_interval(self):
+    def _stop_interval(self):
         if hasattr(self, "timer"):
             self.timer.cancel()
 
@@ -79,9 +79,9 @@ class ControlledIntervaledCounter(ControlledCounter):
         if key.name == self.toggle_key:
             self.running = not self.running
             if self.running:
-                self.set_interval()
+                self._set_interval()
             else:
-                self.stop_interval()
+                self._stop_interval()
         elif key.name == self.backward_key:
             self.count -= self.step
         elif key.name == self.forward_key:
