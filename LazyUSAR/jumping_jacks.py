@@ -145,7 +145,7 @@ class JumpingJackController:
         interval: int,
         starting_jj: int,
         ending_jj: int,
-        jj_type: JumpingJackType,
+        jj_type: JumpingJackType | str,
         end_of_word: str,
         hyphened: bool,
         step=1,
@@ -153,7 +153,9 @@ class JumpingJackController:
         self.interval = interval
         self.starting_jj = starting_jj
         self.ending_jj = ending_jj
-        self.__jj_type = jj_type
+        if not isinstance(jj_type, JumpingJackType):
+            jj_type = getattr(JumpingJackType, jj_type.upper())
+        self.set_jj_type(jj_type)
         self.end_of_word = end_of_word
         self.hyphened = hyphened
         self.counter = counter_types.ControlledIntervaledCounter(
@@ -171,7 +173,7 @@ class JumpingJackController:
         interval: int,  # Milliseconds
         starting_jj: int,  # Including
         ending_jj: int,
-        jj_type: JumpingJackType,
+        jj_type: JumpingJackType | str,
         end_of_word: str,
         hyphened: bool,
         step=1,
@@ -185,7 +187,7 @@ class JumpingJackController:
         interval: int,
         starting_jj: int,
         ending_jj: int,
-        jj_type: JumpingJackType,
+        jj_type: JumpingJackType | str,
         end_of_word: str,
         hyphened: bool,
         step=1,
@@ -203,9 +205,9 @@ class JumpingJackController:
         return self.__jj_type
 
     def _perform_jumping_jack(self, count: int):
-        self.__jj_type.generator(count, self.hyphened, self.end_of_word)
-        if count >= self.ending_jj:
+        if count > self.ending_jj:
             self.exit()
+        self.__jj_type.generator(count, self.hyphened, self.end_of_word)
 
     def reset(self):
         self.counter.reset()
@@ -216,6 +218,15 @@ class JumpingJackController:
 
     def stop(self):
         self.exit()
+
+    # Returns running state after toggling
+    def toggle(self) -> bool:
+        if self.counter.is_listening:
+            self.stop()
+            return False
+        else:
+            self.start()
+            return True
 
     def exit(self):
         system_controller.running = False
