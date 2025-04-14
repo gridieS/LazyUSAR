@@ -127,11 +127,13 @@ class JumpingJackType(Enum):
         )
 
     def _generator_helljack(self, count: int) -> str:
-        iterable = list(number_to_word(count, False, "").replace(" ", ""))
+        iterable = list(number_to_word(count, False, "").replace(" ", "").upper())
         for i in iterable:
             send_roblox_message(i)
             system_controller.press("space")
-        send_roblox_message(number_to_word(count, self.hyphened, self.end_of_word))
+        send_roblox_message(
+            number_to_word(count, self.hyphened, self.end_of_word).upper()
+        )
         system_controller.press("space")  # On linux, this gets blocked often.
 
     def _generator_number(self, count: int) -> str:
