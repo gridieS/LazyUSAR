@@ -2,7 +2,7 @@
 
 This service includes:
 
--   Automatic jumping jacks (No UI)
+-   Automatic jumping jacks (UI)
 
 Planned to include:
 
