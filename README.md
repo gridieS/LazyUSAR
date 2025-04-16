@@ -47,15 +47,17 @@ py -m LazyUSAR
 
 ## Linux
 
-Install the xdotool linux package (Should be already installed if you have x11 installed):
+Install the xdotool and tkinter linux package (Should be already installed if you have x11 and python installed):
 
 ```bash
+sudo apt install python3-tk
 sudo apt install xdotool
 ```
 
 or
 
 ```bash
+sudo dnf install python3-tkinter
 sudo dnf install xdotool
 ```
 
