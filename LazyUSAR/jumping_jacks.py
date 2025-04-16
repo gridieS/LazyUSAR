@@ -150,6 +150,7 @@ class JumpingJackController:
         jj_type: JumpingJackType | str,
         end_of_word: str,
         hyphened: bool,
+        end_callback: callable,
         step=1,
     ):
         self.interval = interval
@@ -160,9 +161,11 @@ class JumpingJackController:
         self.set_jj_type(jj_type)
         self.end_of_word = end_of_word
         self.hyphened = hyphened
+        self.end_callback = end_callback
         self.counter = counter_types.ControlledIntervaledCounter(
             self._perform_jumping_jack,
             self.starting_jj,
+            self.ending_jj,
             self.interval,
             "j",
             "k",
@@ -178,10 +181,18 @@ class JumpingJackController:
         jj_type: JumpingJackType | str,
         end_of_word: str,
         hyphened: bool,
+        end_callback: callable,
         step=1,
     ):
         self._initialize(
-            interval, starting_jj, ending_jj, jj_type, end_of_word, hyphened, step
+            interval,
+            starting_jj,
+            ending_jj,
+            jj_type,
+            end_of_word,
+            hyphened,
+            end_callback,
+            step,
         )
 
     def remake(
@@ -192,10 +203,20 @@ class JumpingJackController:
         jj_type: JumpingJackType | str,
         end_of_word: str,
         hyphened: bool,
+        end_callback: callable,
         step=1,
     ):
+        self.counter.exit()
+
         self._initialize(
-            interval, starting_jj, ending_jj, jj_type, end_of_word, hyphened, step
+            interval,
+            starting_jj,
+            ending_jj,
+            jj_type,
+            end_of_word,
+            hyphened,
+            end_callback,
+            step,
         )
 
     def set_jj_type(self, jj_type: JumpingJackType):
@@ -207,13 +228,13 @@ class JumpingJackController:
         return self.__jj_type
 
     def _perform_jumping_jack(self, count: int):
-        if count > self.ending_jj:
-            self.exit()
-            self.reset()
         self.__jj_type.generator(count, self.hyphened, self.end_of_word)
+        if count + 1 > self.ending_jj:
+            self.reset()
+            self.end_callback()
 
     def reset(self):
-        self.counter.reset()
+        self.counter.count = self.starting_jj - 1
 
     def start(self):
         system_controller.running = True

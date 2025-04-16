@@ -47,7 +47,9 @@ class JumpingJackUI:
             JJ_TYPE_DEFAULT,
             END_CHARACTER_DEFAULT_CHAR,
             False,
+            self.toggle_controller,
         )
+        self.running = False
         keyboard.hook(self.on_key_event)
         # make parse function for jumping_jack_controller, so it appears correctly on the ui
         # make buttons behave like checkboxes
@@ -106,6 +108,9 @@ class JumpingJackUI:
 
         canvas.place(x=0, y=0)
 
+        def start_entry_changed(event: tk.Event):
+            self.update_preview()
+
         self.start_entry = tk.Entry(
             bg="#d9d9d9",
             borderwidth=2.25,
@@ -115,6 +120,8 @@ class JumpingJackUI:
             font="Inter 14",
         )
         self.start_entry.place(x=77, y=156, width=206, height=33)
+        self.start_entry.bind("<Return>", start_entry_changed)
+        self.start_entry.bind("<FocusOut>", start_entry_changed)
 
         canvas.create_text(
             158, 129, anchor="nw", text="Start", fill="#000000", font=("Inter", 18 * -1)
@@ -128,6 +135,9 @@ class JumpingJackUI:
             font=("Inter", 18 * -1),
         )
 
+        def end_entry_changed(event: tk.Event):
+            self.update_preview()
+
         self.end_entry = tk.Entry(
             bg="#d9d9d9",
             borderwidth=2.25,
@@ -138,6 +148,9 @@ class JumpingJackUI:
         )
 
         self.end_entry.place(x=339, y=156, width=206, height=33)
+        self.end_entry.bind("<Return>", end_entry_changed)
+        self.end_entry.bind("<FocusOut>", end_entry_changed)
+
         canvas.create_text(
             426, 129, anchor="nw", text="End", fill="#000000", font=("Inter", 18 * -1)
         )
@@ -344,8 +357,8 @@ class JumpingJackUI:
     def toggle_controller(self):
         if not self.check_parameters():
             return
-        running = self.jumping_jack_controller.toggle()
-        if running:
+        self.running = self.jumping_jack_controller.toggle()
+        if self.running:
             toggle_text = f"Press {self.toggle_key.upper()} to stop"
             self.jumping_jack_controller.start()
         else:
@@ -373,14 +386,29 @@ class JumpingJackUI:
             return HELL_JJ
 
     def update_controller(self):
-        self.jumping_jack_controller.remake(
-            int(self.interval_entry.get()),
-            int(self.start_entry.get()),
-            int(self.end_entry.get()),
-            self.get_active_jj_type(),
-            self.end_character_entry.get(),
-            self.hyphened_checkbox.state.get(),
+        parameters_changed = (
+            int(self.interval_entry.get()) != self.jumping_jack_controller.interval
+            or int(self.start_entry.get()) != self.jumping_jack_controller.starting_jj
+            or int(self.end_entry.get()) != self.jumping_jack_controller.ending_jj
+            or self.get_active_jj_type()
+            != self.jumping_jack_controller.get_jj_type().name.lower()
+            or self.end_character_entry.get()
+            != self.jumping_jack_controller.end_of_word
+            or self.hyphened_checkbox.state.get()
+            != int(self.jumping_jack_controller.hyphened)
         )
+        if parameters_changed and self.running:
+            self.toggle_controller()
+
+            self.jumping_jack_controller.remake(
+                int(self.interval_entry.get()),
+                int(self.start_entry.get()),
+                int(self.end_entry.get()),
+                self.get_active_jj_type(),
+                self.end_character_entry.get(),
+                self.hyphened_checkbox.state.get(),
+                self.toggle_controller,
+            )
 
     def check_parameters(self) -> bool:
         if (

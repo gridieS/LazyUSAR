@@ -54,14 +54,17 @@ class ControlledIntervaledCounter(ControlledCounter):
         self,
         callback: callable,
         start_count: int,
+        stop_count: int,
         interval: int,
         backward_key,
         toggle_key,
         forward_key,
         step=1,
     ):
+        self.stop_count = stop_count
         self.running = False
         self.interval = interval
+        self.timer = None
         super().__init__(
             callback, start_count, backward_key, toggle_key, forward_key, step
         )
@@ -72,10 +75,15 @@ class ControlledIntervaledCounter(ControlledCounter):
             self.count += self.step
             self.timer = Timer(self.interval / 1000, self._set_interval)
             self.timer.start()
+        if self.count > self.stop_count:
+            self._stop_interval()
+            self.reset()
 
     def _stop_interval(self):
-        if hasattr(self, "timer"):
+        if self.timer is not None:
             self.timer.cancel()
+            self.timer = None
+            self.running = False
 
     def on_key_event(self, key):
         if key.event_type != "down":
@@ -92,8 +100,5 @@ class ControlledIntervaledCounter(ControlledCounter):
             self.count += self.step
 
     def exit(self):
-        if self.listener_hook is not None:
-            keyboard.unhook(self.listener_hook)
-        self.listener_hook = None
-        self.is_listening = False
-        self.running = False
+        super().exit()
+        self._stop_interval()
