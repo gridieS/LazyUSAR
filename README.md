@@ -9,7 +9,7 @@ Plans abandoned:
 -   Jumping jack assist
 -   File automatic copy pasting (For tryouts, BCTs and more) 
 
-This project is currently in heavy development.
+This project is currently abandoned.
 
 # Installation (Using binaries)
 
