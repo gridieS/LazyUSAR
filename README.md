@@ -4,10 +4,10 @@ This service includes:
 
 -   Automatic jumping jacks (UI)
 
-Planned to include:
+Plans abandoned:
 
--   Jumping jack assist (In development)
--   File automatic copy pasting (For tryouts, BCTs and more) (In development)
+-   Jumping jack assist
+-   File automatic copy pasting (For tryouts, BCTs and more) 
 
 This project is currently in heavy development.
 
