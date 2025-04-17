@@ -351,8 +351,36 @@ class JumpingJackUI:
         self.window.resizable(False, False)
         self.window.mainloop()
 
-    def exit(self):
-        self.window.destroy()
+    def get_active_jj_type(self) -> str:
+        if self.uppercase_checkbox.state.get():
+            return UPPERCASE_JJ
+        if self.lowercase_checkbox.state.get():
+            return LOWERCASE_JJ
+        if self.grammar_checkbox.state.get():
+            return GRAMMAR_JJ
+        if self.hell_checkbox.state.get():
+            return HELL_JJ
+
+    def keep_only_type(self, current_type: str):
+        if current_type != UPPERCASE_JJ:
+            self.uppercase_checkbox.set(False)
+        if current_type != LOWERCASE_JJ:
+            self.lowercase_checkbox.set(False)
+        if current_type != GRAMMAR_JJ:
+            self.grammar_checkbox.set(False)
+        if current_type != HELL_JJ:
+            self.hell_checkbox.set(False)
+
+        if current_type == UPPERCASE_JJ:
+            self.uppercase_checkbox.set(True)
+        if current_type == LOWERCASE_JJ:
+            self.lowercase_checkbox.set(True)
+        if current_type == GRAMMAR_JJ:
+            self.grammar_checkbox.set(True)
+        if current_type == HELL_JJ:
+            self.hell_checkbox.set(True)
+
+        self.update_preview()
 
     def toggle_controller(self):
         if not self.check_parameters():
@@ -367,25 +395,7 @@ class JumpingJackUI:
 
         self.toggle_button_text.config(text=toggle_text)
 
-    def on_key_event(self, key: keyboard.KeyboardEvent):
-        if key.event_type != "down":
-            return
-        if key.name == self.exit_key:
-            self.exit()
-        if key.name == self.toggle_key:
-            self.toggle_controller()
-
-    def get_active_jj_type(self) -> str:
-        if self.uppercase_checkbox.state.get():
-            return UPPERCASE_JJ
-        if self.lowercase_checkbox.state.get():
-            return LOWERCASE_JJ
-        if self.grammar_checkbox.state.get():
-            return GRAMMAR_JJ
-        if self.hell_checkbox.state.get():
-            return HELL_JJ
-
-    def update_controller(self):
+    def remake_controller(self):
         parameters_changed = (
             int(self.interval_entry.get()) != self.jumping_jack_controller.interval
             or int(self.start_entry.get()) != self.jumping_jack_controller.starting_jj
@@ -430,42 +440,6 @@ class JumpingJackUI:
 
         return True
 
-    def keep_only_type(self, current_type: str):
-        if current_type != UPPERCASE_JJ:
-            self.uppercase_checkbox.set(False)
-        if current_type != LOWERCASE_JJ:
-            self.lowercase_checkbox.set(False)
-        if current_type != GRAMMAR_JJ:
-            self.grammar_checkbox.set(False)
-        if current_type != HELL_JJ:
-            self.hell_checkbox.set(False)
-
-        if current_type == UPPERCASE_JJ:
-            self.uppercase_checkbox.set(True)
-        if current_type == LOWERCASE_JJ:
-            self.lowercase_checkbox.set(True)
-        if current_type == GRAMMAR_JJ:
-            self.grammar_checkbox.set(True)
-        if current_type == HELL_JJ:
-            self.hell_checkbox.set(True)
-
-        self.update_preview()
-
-    def default_remake(self):
-        self.end_character_entry.delete(0, tk.END)
-        self.end_character_entry.insert(tk.END, END_CHARACTER_DEFAULT_CHAR)
-        self.interval_entry.delete(0, tk.END)
-        self.interval_entry.insert(tk.END, str(INTERVAL_DEFAULT_TIME))
-        self.uppercase_checkbox.toggle_callback()
-        self.hyphened_checkbox.set(False)
-        self.start_entry.delete(0, tk.END)
-        self.start_entry.insert(tk.END, START_JJ_DEFAULT)
-        self.end_entry.delete(0, tk.END)
-        self.end_entry.insert(tk.END, END_JJ_DEFAULT)
-        self.keep_only_type(JJ_TYPE_DEFAULT)
-
-        self.update_preview()
-
     def update_preview(self):
         if self.get_active_jj_type() == UPPERCASE_JJ:
             preview_text = "TWENTY ONE" + self.end_character_entry.get()
@@ -484,4 +458,30 @@ class JumpingJackUI:
 
         passed_checks = self.check_parameters()
         if passed_checks:
-            self.update_controller()
+            self.remake_controller()
+
+    def default_remake(self):
+        self.end_character_entry.delete(0, tk.END)
+        self.end_character_entry.insert(tk.END, END_CHARACTER_DEFAULT_CHAR)
+        self.interval_entry.delete(0, tk.END)
+        self.interval_entry.insert(tk.END, str(INTERVAL_DEFAULT_TIME))
+        self.uppercase_checkbox.toggle_callback()
+        self.hyphened_checkbox.set(False)
+        self.start_entry.delete(0, tk.END)
+        self.start_entry.insert(tk.END, START_JJ_DEFAULT)
+        self.end_entry.delete(0, tk.END)
+        self.end_entry.insert(tk.END, END_JJ_DEFAULT)
+        self.keep_only_type(JJ_TYPE_DEFAULT)
+
+        self.update_preview()
+
+    def on_key_event(self, key: keyboard.KeyboardEvent):
+        if key.event_type != "down":
+            return
+        if key.name == self.exit_key:
+            self.exit()
+        if key.name == self.toggle_key:
+            self.toggle_controller()
+
+    def exit(self):
+        self.window.destroy()
