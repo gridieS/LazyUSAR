@@ -98,7 +98,7 @@ class JumpingJackUI:
 
         canvas = tk.Canvas(
             self.window,
-            bg="#d4d4d4",
+            bg="#c5c5c5",
             width=615,
             height=701,
             bd=0,
