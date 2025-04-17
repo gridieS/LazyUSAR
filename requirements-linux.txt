@@ -1,1 +1,2 @@
+# Make sure to read the README for the extra requirements
 keyboard==0.13.5
