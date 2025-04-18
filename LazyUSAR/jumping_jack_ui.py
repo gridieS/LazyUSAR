@@ -461,4 +461,5 @@ class JumpingJackUI:
 
     def exit(self):
         keyboard.unhook(self.on_key_event)
+        self.jumping_jack_controller.exit()
         self.window.destroy()
