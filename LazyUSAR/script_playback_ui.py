@@ -87,7 +87,6 @@ class ScriptPlaybackUI:
             relief="solid",
             highlightbackground="black",
             insertbackground="#000000",
-            highlightthickness=0,
             font="Inter 14",
         )
 
@@ -114,7 +113,6 @@ class ScriptPlaybackUI:
             relief="solid",
             highlightbackground="black",
             insertbackground="#000000",
-            highlightthickness=0,
             font="Inter 14",
         )
 
@@ -137,7 +135,6 @@ class ScriptPlaybackUI:
             relief="solid",
             highlightbackground="black",
             insertbackground="#000000",
-            highlightthickness=0,
             font="Inter 14",
         )
 
