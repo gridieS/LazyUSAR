@@ -7,11 +7,17 @@ import keyboard
 from .ui_helper import Checkbox, load_asset
 from .script_playback import ScriptPlaybackController
 
-DEFAULT_SCRIPT_METHOD = "file"
-DEFAULT_LINE_NUM_TEXT = "0"
-DEFAULT_LINE_TEXT = "The script line will appear here"
+DEFAULT_INTERVAL_TIME = 5
+MIN_INTERVAL_TIME = 1
 
+DEFAULT_SCRIPT_METHOD = "file"
 DEFAULT_FILE_TEXT = "No file chosen"
+
+DEFAULT_USERNAME_TEXT = "YourName"
+DEFAULT_RANK_TEXT = "YourRank"
+
+DEFAULT_LINE_NUM = 0
+DEFAULT_LINE_TEXT = "The script line will appear here"
 
 
 class ScriptPlaybackUI:
@@ -23,10 +29,17 @@ class ScriptPlaybackUI:
     ):
         self.switch_callback = switch_callback
         self.toggle_key = toggle_key
-        self.script_playback_controller = ScriptPlaybackController()
+        self.script_playback_controller = ScriptPlaybackController(
+            self.toggle_controller
+        )
+
+        self.cur_file_path = ""
+        self.cur_line = ""
+        self.cur_line_num = DEFAULT_LINE_NUM
+        self.script_array = []
 
         self.exit_key = exit_key
-        self.running = False
+        self.controller_running = False
         keyboard.hook(self.on_key_event)
 
     def start(self):
@@ -72,6 +85,9 @@ class ScriptPlaybackUI:
         canvas.create_line(563, 111, 563, 349, fill="#000000", width=0.75)
 
         canvas.create_text(
+            413, 129, anchor="nw", text="Rank", fill="#000000", font=("Inter", 18 * -1)
+        )
+        canvas.create_text(
             326,
             201,
             anchor="nw",
@@ -80,7 +96,7 @@ class ScriptPlaybackUI:
             font=("Inter", 18 * -1),
         )
 
-        textbox_1 = tk.Entry(
+        self.rank_entry = tk.Entry(
             bg="#d9d9d9",
             borderwidth=2.25,
             justify="center",
@@ -90,10 +106,15 @@ class ScriptPlaybackUI:
             font="Inter 14",
         )
 
-        textbox_1.place(x=332, y=158, width=206, height=33)
+        self.rank_entry.place(x=332, y=158, width=206, height=33)
 
         canvas.create_text(
-            413, 129, anchor="nw", text="Rank", fill="#000000", font=("Inter", 18 * -1)
+            137,
+            129,
+            anchor="nw",
+            text="Username",
+            fill="#000000",
+            font=("Inter", 18 * -1),
         )
 
         canvas.create_text(
@@ -105,7 +126,7 @@ class ScriptPlaybackUI:
             font=("Inter", 18 * -1),
         )
 
-        textbox_2 = tk.Entry(
+        self.username_entry = tk.Entry(
             bd=0,
             bg="#d9d9d9",
             borderwidth=2.25,
@@ -116,18 +137,9 @@ class ScriptPlaybackUI:
             font="Inter 14",
         )
 
-        textbox_2.place(x=78, y=158, width=206, height=33)
+        self.username_entry.place(x=78, y=158, width=206, height=33)
 
-        canvas.create_text(
-            137,
-            129,
-            anchor="nw",
-            text="Username",
-            fill="#000000",
-            font=("Inter", 18 * -1),
-        )
-
-        textbox_3 = tk.Entry(
+        self.interval_entry = tk.Entry(
             bd=0,
             bg="#d9d9d9",
             borderwidth=2.25,
@@ -138,7 +150,7 @@ class ScriptPlaybackUI:
             font="Inter 14",
         )
 
-        textbox_3.place(x=204, y=271, width=206, height=33)
+        self.interval_entry.place(x=204, y=271, width=206, height=33)
 
         canvas.create_text(
             274,
@@ -158,8 +170,8 @@ class ScriptPlaybackUI:
             font=("Inter", 18 * -1),
         )
 
-        label_1 = tk.Label(
-            text="Press F6 to start",
+        self.toggle_button_label = tk.Label(
+            text=f"Press {self.toggle_key.upper()} to start",
             fg="#000000",
             bg="#d9d9d9",
             relief="solid",
@@ -167,7 +179,8 @@ class ScriptPlaybackUI:
             font=("Inter", -18),
         )
 
-        label_1.place(x=139, y=30, width=340, height=37)
+        self.toggle_button_label.place(x=139, y=30, width=340, height=37)
+        self.toggle_button_label.bind("<Button-1>", lambda _: self.toggle_controller())
 
         self.text_method_checkbox = Checkbox(
             self.toggle_script_method_pressed, args=["text"], mini=True
@@ -204,9 +217,6 @@ class ScriptPlaybackUI:
         )
         self.line_num_label.place(x=306, y=516, width=25, height=25, anchor="center")
 
-        def reset_button_pressed(event):
-            print("Reset pressed")
-
         self.reset_button = tk.Label(
             text="Reset",
             relief="solid",
@@ -217,13 +227,13 @@ class ScriptPlaybackUI:
         )
 
         self.reset_button.place(x=260, y=594, width=96, height=37)
-        self.reset_button.bind("<Button-1>", reset_button_pressed)
+        self.reset_button.bind("<Button-1>", lambda _: self.set_file_defaults())
 
         self.file_text_label = tk.Label(
             justify="center",
             text=DEFAULT_FILE_TEXT,
             bg="#c5c5c5",
-            font=("Inter 14"),
+            font=("Inter 12"),
         )
 
         self.file_text_label.place(x=307, y=463, width=486, height=18, anchor="center")
@@ -246,11 +256,23 @@ class ScriptPlaybackUI:
         self.text_method.place(x=126, y=410, width=364, height=98)
 
         def choose_file_button_pressed(event):
-            cur_file = askopenfilename()
-            if len(cur_file) == 0:
-                print("Not a valid file")
-            else:
-                print(f"Current file: {cur_file}")
+            file_path = askopenfilename()
+            if len(file_path) == 0:
+                return
+            self.cur_file_path = file_path
+            try:
+                with open(file_path, "r") as file:
+                    content = file.read()
+                    self.cur_file_path = file_path
+                    self.script_array = list(
+                        filter(lambda line: line.strip() != "", content.splitlines())
+                    )
+                    self.cur_file_path = file_path
+                    self.cur_line_num = 1
+            except Exception as e:
+                print(f"Error reading file: {e}")
+
+            self.update_preview()
 
         self.choose_file_button = tk.Label(
             text="Choose file",
@@ -292,6 +314,33 @@ class ScriptPlaybackUI:
         self.window.resizable(False, False)
         self.window.mainloop()
 
+    def check_parameters(self):
+        if (
+            self.interval_entry.get() == ""
+            or self.username_entry.get() == ""
+            or self.rank_entry.get() == ""
+        ):
+            return False
+        elif not self.interval_entry.get().isnumeric():
+            return False
+        elif int(self.interval_entry.get()) < MIN_INTERVAL_TIME:
+            return False
+
+        return True
+
+    def toggle_controller(self):
+        if not self.check_parameters():
+            return
+        self.controller_running = self.script_playback_controller.toggle()
+        if self.controller_running:
+            toggle_text = f"Press {self.toggle_key.upper()} to stop"
+            self.script_playback_controller.start()
+        else:
+            toggle_text = f"Press {self.toggle_key.upper()} to start"
+            self.script_playback_controller.stop()
+
+        self.toggle_button_label.config(text=toggle_text)
+
     def toggle_script_method_pressed(self, value: bool, method: str):
         if value == False:
             self.cur_method.set(True)
@@ -311,27 +360,47 @@ class ScriptPlaybackUI:
                     )
                     self.choose_file_button.place(x=265, y=479, width=85, height=25)
 
-    def toggle_controller(self):
-        self.running = self.jumping_jack_controller.toggle()
-        if self.running:
-            toggle_text = f"Press {self.toggle_key.upper()} to stop"
-            self.jumping_jack_controller.start()
-        else:
-            toggle_text = f"Press {self.toggle_key.upper()} to start"
-            self.jumping_jack_controller.stop()
+    def set_file_defaults(self):
+        self.script_playback_controller.exit()
+        if self.controller_running:
+            self.toggle_controller()
 
-        self.toggle_button_text.config(text=toggle_text)
+        self.cur_file_path = DEFAULT_FILE_TEXT
+        self.cur_line = DEFAULT_LINE_TEXT
+        self.cur_line_num = int(DEFAULT_LINE_NUM)
+        self.script_array = []
+
+        self.update_preview()
 
     def set_defaults(self):
+        self.interval_entry.delete(0, tk.END)
+        self.interval_entry.insert(tk.END, str(DEFAULT_INTERVAL_TIME))
+
+        self.username_entry.delete(0, tk.END)
+        self.username_entry.insert(tk.END, DEFAULT_USERNAME_TEXT)
+
+        self.rank_entry.delete(0, tk.END)
+        self.rank_entry.insert(tk.END, DEFAULT_RANK_TEXT)
+
         if DEFAULT_SCRIPT_METHOD == "text":
             self.cur_method = self.text_method_checkbox
         elif DEFAULT_SCRIPT_METHOD == "file":
             self.cur_method = self.file_method_checkbox
-        self.file_text_label.config(text=DEFAULT_FILE_TEXT)
+            self.set_file_defaults()
         self.toggle_script_method_pressed(True, DEFAULT_SCRIPT_METHOD)
         self.cur_method.set(True)
-        self.line_label.config(text=DEFAULT_LINE_TEXT)
-        self.line_num_label.config(text=DEFAULT_LINE_NUM_TEXT)
+
+        self.update_preview()
+
+    def update_preview(self):
+        self.file_text_label.config(text=self.cur_file_path)
+        self.cur_line = (
+            self.script_array[int(self.cur_line_num) - 1]
+            if self.script_array
+            else DEFAULT_LINE_TEXT
+        )
+        self.line_label.config(text=self.cur_line)
+        self.line_num_label.config(text=str(self.cur_line_num))
 
     def on_key_event(self, key: keyboard.KeyboardEvent):
         if key.event_type != "down":
@@ -343,4 +412,5 @@ class ScriptPlaybackUI:
 
     def exit(self):
         keyboard.unhook(self.on_key_event)
+        self.script_playback_controller.exit()
         self.window.destroy()

@@ -288,9 +288,6 @@ class JumpingJackUI:
         )
         self.preview_text.place(x=54, y=622, width=508, height=37)
 
-        def toggle_button_pressed(event):
-            self.toggle_controller()
-
         canvas.create_rectangle(
             138, 30, 478, 67, fill="#d9d9d9", outline="#9f9f9f", width="2.25"
         )
@@ -302,7 +299,7 @@ class JumpingJackUI:
             font="Inter 14",
         )
         self.toggle_button_text.place(x=140, y=32, width=336, height=33)
-        self.toggle_button_text.bind("<Button-1>", toggle_button_pressed)
+        self.toggle_button_text.bind("<Button-1>", lambda _: self.toggle_controller())
 
         def switch_button_pressed():
             self.exit()

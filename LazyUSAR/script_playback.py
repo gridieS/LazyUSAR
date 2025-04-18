@@ -5,5 +5,22 @@
 
 
 class ScriptPlaybackController:
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        end_callback: callable,
+    ):
+        self.islistening = False
+        self.end_callback = end_callback
+
+    def start(self):
+        print("Started")
+
+    def stop(self):
+        self.exit()
+
+    def exit(self):
+        print("Exited")
+
+    def toggle(self) -> bool:
+        self.islistening = not self.islistening
+        return self.islistening
