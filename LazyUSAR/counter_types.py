@@ -54,13 +54,15 @@ class ControlledIntervaledCounter(ControlledCounter):
         self,
         callback: callable,
         start_count: int,
-        stop_count: int,
         interval: int,
         backward_key,
         toggle_key,
         forward_key,
+        stop_count: int | None = None,
         step=1,
     ):
+        if stop_count is None:
+            stop_count = float("inf")
         self.stop_count = stop_count
         self.running = False
         self.interval = interval

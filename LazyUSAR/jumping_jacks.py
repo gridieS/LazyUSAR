@@ -166,12 +166,12 @@ class JumpingJackController:
         self.counter = ControlledIntervaledCounter(
             self._perform_jumping_jack,
             self.starting_jj,
-            self.ending_jj,
             self.interval,
-            "j",
-            "k",
-            "l",
-            step,
+            stop_count=self.ending_jj,
+            backward_key="j",
+            toggle_key="k",
+            forward_key="l",
+            step=step,
         )
 
     def __init__(
