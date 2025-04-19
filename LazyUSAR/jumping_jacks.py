@@ -235,7 +235,7 @@ class JumpingJackController:
             self.end_callback()
 
     def reset(self):
-        self.counter.count = self.starting_jj - 1
+        self.counter.reset()
 
     def start(self):
         system_controller.running = True
