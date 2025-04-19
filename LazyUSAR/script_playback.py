@@ -1,6 +1,8 @@
+from time import sleep
 from . import system_controller
 from .counter_types import ControlledIntervaledCounter
-from time import sleep
+
+DELAY_MS = 150
 
 
 class ScriptPlaybackController:
@@ -61,7 +63,12 @@ class ScriptPlaybackController:
         )
 
     def _send_script_line(self, line_num: int):
-        print(f"Sending script line: {self.script_array[line_num]}")
+        # Press /, then copy the line, then paste the line, then press enter
+        system_controller.press("/")
+        sleep(DELAY_MS / 1000)
+        system_controller.copy(self.script_array[line_num])
+        system_controller.paste()
+        system_controller.press("enter")
         self.playback_callback(self.script_array[line_num], line_num)
         if line_num + 1 >= len(self.script_array):
             self.reset()

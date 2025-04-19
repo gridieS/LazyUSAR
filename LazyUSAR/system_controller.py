@@ -1,6 +1,7 @@
 import sys
 import subprocess
-import time
+import pyperclip
+from keyboard import press
 
 IS_WINDOWS = sys.platform.startswith("win")
 IS_LINUX = sys.platform.startswith("linux")
@@ -60,6 +61,28 @@ WINDOWS_SPECIAL_CHARACTERS = {
     "Y": "y",
     "Z": "z",
 }
+
+
+# Adds clipboard support for both Windows and Linux using pyperclip
+def copy(text: str) -> None:
+    if not running:
+        return
+    try:
+        pyperclip.copy(text)
+    except pyperclip.PyperclipException as e:
+        print(f"[system_controller] Error copying text to clipboard: {e}")
+
+
+def paste() -> None:
+    if not running:
+        return
+    try:
+        if IS_LINUX:
+            press("ctrl+v")
+        elif IS_WINDOWS:
+            pdi.hotkey("ctrl", "v")
+    except pyperclip.PyperclipException as e:
+        print(f"[system_controller] Error pasting text from clipboard: {e}")
 
 
 def write(text: str) -> None:

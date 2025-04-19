@@ -8,7 +8,7 @@ from .ui_helper import Checkbox, load_asset
 from .script_playback import ScriptPlaybackController
 
 DEFAULT_INTERVAL_TIME = 2
-MIN_INTERVAL_TIME = 1
+MIN_INTERVAL_TIME = 0.5
 
 DEFAULT_SCRIPT_METHOD = "file"
 DEFAULT_FILE_TEXT = "No file chosen"
@@ -250,6 +250,10 @@ class ScriptPlaybackUI:
         # self.text_method.tag_add("center", "1.0", "end")
         # self.text_method.bind("<<Modified>>", center_text)
 
+        def text_method_focus_out(event):
+            self.script = self.text_method.get("1.0", "end-1c")
+            self.remake_controller()
+
         self.text_method = tk.Text(
             bg="#d9d9d9",
             relief="solid",
@@ -259,6 +263,7 @@ class ScriptPlaybackUI:
             highlightthickness=0,
         )
         self.text_method.place(x=126, y=410, width=364, height=98)
+        self.text_method.bind("<FocusOut>", text_method_focus_out)
 
         def choose_file_button_pressed(event):
             file_path = askopenfilename()
@@ -327,9 +332,11 @@ class ScriptPlaybackUI:
             or self.rank_entry.get() == ""
         ):
             return False
-        elif not self.interval_entry.get().isnumeric():
+        elif (
+            not "".join(self.interval_entry.get().split(".")).strip().isnumeric()
+        ):  # Removed any whitespaces and dots, joins, and checks if is numeric
             return False
-        elif int(self.interval_entry.get()) < MIN_INTERVAL_TIME:
+        elif float(self.interval_entry.get()) < MIN_INTERVAL_TIME:
             return False
 
         return True
@@ -348,10 +355,16 @@ class ScriptPlaybackUI:
         self.toggle_button_label.config(text=toggle_text)
 
     def remake_controller(self):
-        if not self.controller_running:
-            self.toggle_controller()
+        paramaters_changed = (
+            float(self.script_playback_controller.interval / 1000)
+            != float(self.interval_entry.get())
+            or self.script_playback_controller.username != self.username_entry.get()
+            or self.script_playback_controller.rank != self.rank_entry.get()
+            or self.script_playback_controller.script_array == []
+        )
+        if paramaters_changed:
             self.script_playback_controller.remake(
-                int(self.interval_entry.get()),
+                float(self.interval_entry.get()),
                 self.script,
                 self.username_entry.get(),
                 self.rank_entry.get(),
@@ -391,12 +404,18 @@ class ScriptPlaybackUI:
     def set_defaults(self):
         self.interval_entry.delete(0, tk.END)
         self.interval_entry.insert(tk.END, str(DEFAULT_INTERVAL_TIME))
+        self.interval_entry.bind("<Return>", lambda _: self.remake_controller())
+        self.interval_entry.bind("<FocusOut>", lambda _: self.remake_controller())
 
         self.username_entry.delete(0, tk.END)
         self.username_entry.insert(tk.END, DEFAULT_USERNAME_TEXT)
+        self.username_entry.bind("<Return>", lambda _: self.remake_controller())
+        self.username_entry.bind("<FocusOut>", lambda _: self.remake_controller())
 
         self.rank_entry.delete(0, tk.END)
         self.rank_entry.insert(tk.END, DEFAULT_RANK_TEXT)
+        self.rank_entry.bind("<Return>", lambda _: self.remake_controller())
+        self.rank_entry.bind("<FocusOut>", lambda _: self.remake_controller())
 
         if DEFAULT_SCRIPT_METHOD == "text":
             self.cur_method = self.text_method_checkbox
