@@ -1,9 +1,3 @@
-# Process file, move to array
-# For each i, copy array[i] to clipboard
-# Enter chat, paste from clipboard
-# Do until done
-# from .counter_types import ControlledIntervaledCounter
-# from . import system_controller
 from . import system_controller
 from .counter_types import ControlledIntervaledCounter
 from time import sleep
