@@ -3,11 +3,11 @@
 This service includes:
 
 -   Automatic jumping jacks (UI)
+-   File automatic copy pasting (For tryouts, BCTs and more)
 
 Plans abandoned:
 
 -   Jumping jack assist
--   File automatic copy pasting (For tryouts, BCTs and more) 
 
 This project is currently abandoned.
 
