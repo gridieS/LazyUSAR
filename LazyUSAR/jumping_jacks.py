@@ -1,7 +1,8 @@
 from time import sleep
 
 from enum import Enum
-from . import counter_types, system_controller
+from . import system_controller
+from .counter_types import ControlledIntervaledCounter
 
 DELAY_MS = 190
 
@@ -162,7 +163,7 @@ class JumpingJackController:
         self.end_of_word = end_of_word
         self.hyphened = hyphened
         self.end_callback = end_callback
-        self.counter = counter_types.ControlledIntervaledCounter(
+        self.counter = ControlledIntervaledCounter(
             self._perform_jumping_jack,
             self.starting_jj,
             self.ending_jj,
