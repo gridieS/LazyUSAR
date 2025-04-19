@@ -75,7 +75,7 @@ class ControlledIntervaledCounter(ControlledCounter):
         if self.count > self.stop_count:
             self.reset()
             self._stop_interval()
-        if self.running:
+        elif self.running:
             self.callback(self.count)
             self.count += self.step
             self.timer = Timer(self.interval / 1000, self._set_interval)
@@ -91,6 +91,8 @@ class ControlledIntervaledCounter(ControlledCounter):
         if key.event_type != "down":
             return
         if key.name == self.toggle_key:
+            if not self.running:
+                self.reset()
             self.running = not self.running
             if self.running:
                 self._set_interval()
