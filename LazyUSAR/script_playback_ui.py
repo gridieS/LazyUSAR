@@ -7,7 +7,7 @@ import keyboard
 from .ui_helper import Checkbox, load_asset
 from .script_playback import ScriptPlaybackController
 
-DEFAULT_INTERVAL_TIME = 5
+DEFAULT_INTERVAL_TIME = 2
 MIN_INTERVAL_TIME = 1
 
 DEFAULT_SCRIPT_METHOD = "file"
@@ -29,14 +29,19 @@ class ScriptPlaybackUI:
     ):
         self.switch_callback = switch_callback
         self.toggle_key = toggle_key
-        self.script_playback_controller = ScriptPlaybackController(
-            self.toggle_controller
-        )
 
         self.cur_file_path = ""
         self.cur_line = ""
         self.cur_line_num = DEFAULT_LINE_NUM
-        self.script_array = []
+        self.script = ""
+        self.script_playback_controller = ScriptPlaybackController(
+            self.toggle_controller,
+            self.script_playback_callback,
+            DEFAULT_INTERVAL_TIME,
+            "",
+            DEFAULT_USERNAME_TEXT,
+            DEFAULT_RANK_TEXT,
+        )
 
         self.exit_key = exit_key
         self.controller_running = False
@@ -227,13 +232,13 @@ class ScriptPlaybackUI:
         )
 
         self.reset_button.place(x=260, y=594, width=96, height=37)
-        self.reset_button.bind("<Button-1>", lambda _: self.set_file_defaults())
+        self.reset_button.bind("<Button-1>", lambda _: self.set_defaults())
 
         self.file_text_label = tk.Label(
             justify="center",
             text=DEFAULT_FILE_TEXT,
             bg="#c5c5c5",
-            font=("Inter 12"),
+            font=("Inter 10"),
         )
 
         self.file_text_label.place(x=307, y=463, width=486, height=18, anchor="center")
@@ -259,19 +264,20 @@ class ScriptPlaybackUI:
             file_path = askopenfilename()
             if len(file_path) == 0:
                 return
-            self.cur_file_path = file_path
+            if self.cur_file_path == file_path or not file_path.endswith(
+                (".txt", ".md")
+            ):
+                return
             try:
-                with open(file_path, "r") as file:
+                with open(file_path, "rb") as file:
                     content = file.read()
                     self.cur_file_path = file_path
-                    self.script_array = list(
-                        filter(lambda line: line.strip() != "", content.splitlines())
-                    )
-                    self.cur_file_path = file_path
+                    self.script = content.decode("utf-8", errors="ignore")
                     self.cur_line_num = 1
             except Exception as e:
                 print(f"Error reading file: {e}")
 
+            self.remake_controller()
             self.update_preview()
 
         self.choose_file_button = tk.Label(
@@ -341,6 +347,16 @@ class ScriptPlaybackUI:
 
         self.toggle_button_label.config(text=toggle_text)
 
+    def remake_controller(self):
+        if not self.controller_running:
+            self.toggle_controller()
+            self.script_playback_controller.remake(
+                int(self.interval_entry.get()),
+                self.script,
+                self.username_entry.get(),
+                self.rank_entry.get(),
+            )
+
     def toggle_script_method_pressed(self, value: bool, method: str):
         if value == False:
             self.cur_method.set(True)
@@ -368,7 +384,7 @@ class ScriptPlaybackUI:
         self.cur_file_path = DEFAULT_FILE_TEXT
         self.cur_line = DEFAULT_LINE_TEXT
         self.cur_line_num = int(DEFAULT_LINE_NUM)
-        self.script_array = []
+        self.script = ""
 
         self.update_preview()
 
@@ -394,13 +410,13 @@ class ScriptPlaybackUI:
 
     def update_preview(self):
         self.file_text_label.config(text=self.cur_file_path)
-        self.cur_line = (
-            self.script_array[int(self.cur_line_num) - 1]
-            if self.script_array
-            else DEFAULT_LINE_TEXT
-        )
         self.line_label.config(text=self.cur_line)
         self.line_num_label.config(text=str(self.cur_line_num))
+
+    def script_playback_callback(self, line: str, line_num: int):
+        self.cur_line = line
+        self.cur_line_num = line_num + 1
+        self.update_preview()
 
     def on_key_event(self, key: keyboard.KeyboardEvent):
         if key.event_type != "down":

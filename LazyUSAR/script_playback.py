@@ -13,8 +13,9 @@ class ScriptPlaybackController:
         username: str,
         rank: str,
     ):
-        self.interval = interval
+        self.interval = interval * 1000  # Convert to milliseconds
         script = script.replace("<username>", username)
+        script = script.replace("<name>", username)
         script = script.replace("<rank>", rank)
         self.script_array = list(
             filter(lambda line: line.strip() != "", script.splitlines())
@@ -61,8 +62,8 @@ class ScriptPlaybackController:
 
     def _send_script_line(self, line_num: int):
         print(f"Sending script line: {self.script_array[line_num]}")
-        self.playback_callback(self.script_array[line_num])
-        if line_num + 1 > len(self.script_array):
+        self.playback_callback(self.script_array[line_num], line_num)
+        if line_num + 1 >= len(self.script_array):
             self.reset()
             self.end_callback()
 
@@ -80,6 +81,9 @@ class ScriptPlaybackController:
     def exit(self):
         system_controller.running = False
         self.counter.exit()
+
+    def reset(self):
+        self.counter.reset()
 
     def toggle(self) -> bool:
         if len(self.script_array) == 0:

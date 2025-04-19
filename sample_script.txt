@@ -1,0 +1,6 @@
+Hello, I am your instructor <rank> <name>, and I will be hosting the event today
+
+
+Before we start, Permission to speak is now in effect, you must use PTS in order to speak.
+
+You shall only address me as <rank> and that only, is that clear?
