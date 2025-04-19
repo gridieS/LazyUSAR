@@ -4,8 +4,8 @@
 # Do until done
 # from .counter_types import ControlledIntervaledCounter
 # from . import system_controller
-import system_controller
-from counter_types import ControlledIntervaledCounter
+from . import system_controller
+from .counter_types import ControlledIntervaledCounter
 from time import sleep
 
 
