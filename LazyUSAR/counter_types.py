@@ -72,14 +72,14 @@ class ControlledIntervaledCounter(ControlledCounter):
         )
 
     def _set_interval(self):
+        if self.count > self.stop_count:
+            self.reset()
+            self._stop_interval()
         if self.running:
             self.callback(self.count)
             self.count += self.step
             self.timer = Timer(self.interval / 1000, self._set_interval)
             self.timer.start()
-        if self.count > self.stop_count:
-            self._stop_interval()
-            self.reset()
 
     def _stop_interval(self):
         if self.timer is not None:
