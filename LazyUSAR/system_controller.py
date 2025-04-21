@@ -2,6 +2,7 @@ import sys
 import subprocess
 import pyperclip
 from keyboard import press
+from time import sleep
 
 IS_WINDOWS = sys.platform.startswith("win")
 IS_LINUX = sys.platform.startswith("linux")
@@ -80,7 +81,11 @@ def paste() -> None:
         if IS_LINUX:
             press("ctrl+v")
         elif IS_WINDOWS:
-            pdi.hotkey("ctrl", "v")
+            pdi.keyDown("ctrl")
+            sleep(DELAY_MS / 1000)
+            pdi.press("v")
+            sleep(DELAY_MS / 1000)
+            pdi.keyUp("ctrl")
     except pyperclip.PyperclipException as e:
         print(f"[system_controller] Error pasting text from clipboard: {e}")
 
