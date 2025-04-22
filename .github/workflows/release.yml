@@ -35,6 +35,7 @@ jobs:
                   python_ver: "3.10"
                   spec: "build-windows.spec"
                   upload_exe_with_name: "windows"
+                  requirements: "requirements-windows.txt"
 
     build-linux:
         needs: prepare
@@ -46,6 +47,7 @@ jobs:
                   python_ver: "3.10"
                   spec: "build-linux.spec"
                   upload_exe_with_name: "linux-x86_64"
+                  requirements: "requirements-linux.txt"
 
     release:
         needs: [prepare, build-windows, build-linux]
