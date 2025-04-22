@@ -52,7 +52,7 @@ class ScriptPlaybackUI:
         self.window = tk.Tk()
         self.window.geometry("615x745")
         self.window.configure(bg="#d4d4d4")
-        self.window.title("Tkinter Export")
+        self.window.title("Script Playback")
 
         canvas = tk.Canvas(
             self.window,
