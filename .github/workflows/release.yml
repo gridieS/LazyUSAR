@@ -49,13 +49,13 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Download Windows artifact
-              uses: actions/download-artifact@v3
+              uses: actions/download-artifact@v4
               with:
                   name: windows
                   path: artifact
 
             - name: Download Linux artifact
-              uses: actions/download-artifact@v3
+              uses: actions/download-artifact@v4
               with:
                   name: linux-x86_64
                   path: artifact
