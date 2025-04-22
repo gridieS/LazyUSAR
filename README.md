@@ -11,7 +11,25 @@ Plans abandoned:
 
 # Installation (Using binaries)
 
-Coming soon..
+NOTE: All binaries are in the x86_64 architecture.
+
+## Winodows
+
+Download the LazyUSAR.exe file from the latest release, and double click on it in the file manager to run, it's that simple!
+
+## Linux
+
+Download the LazyUSAR.bin file from the latest release, and then add the execute permission on the file using
+
+```bash
+chmod +x LazyUSAR.bin
+```
+
+Then, simply execute the file with
+
+```bash
+./LazyUSAR.bin
+```
 
 # Installation (Using python)
 
@@ -77,7 +95,9 @@ Then run the package keeping python's virtual enviroment:
 ```bash
 sudo env PATH=$PATH python3 -m LazyUSAR
 ```
+
 # Usage
+
 Upon running the package, you are shown a UI made with python's Tkinter.
 
 The package is forcefully exited on the key press F6.
@@ -89,19 +109,22 @@ You are first shown the Jumping Jack Controller UI, used for modifying the Jumpi
 ## Jumping Jack Controller Listener Keybinds
 
 The listener listens for three keyboard keys: "j", "k", and "l":
-* k is used for starting/stopping the jumping jacks
-* j is used for setting the jumping jack value to the previous value
-* l is used for setting the jumping jack value to the next value
+
+-   k is used for starting/stopping the jumping jacks
+-   j is used for setting the jumping jack value to the previous value
+-   l is used for setting the jumping jack value to the next value
 
 ## Script Playback Controller Listener Keybinds
 
 The listener listens for the same three keyboard keys: "j", "k", and "l":
-* k is used for starting/stopping the playback
-* j is used for setting the line index value to the previous value
-* l is used for setting the line index value to the next value
+
+-   k is used for starting/stopping the playback
+-   j is used for setting the line index value to the previous value
+-   l is used for setting the line index value to the next value
 
 ## Script Playback Usage
-You may open a text file, or paste your script into a textbox. 
+
+You may open a text file, or paste your script into a textbox.
 
 Every entry of \<username\> and \<name\> gets replaced by the value you set in the UI.
 
