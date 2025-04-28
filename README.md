@@ -13,7 +13,7 @@ Plans abandoned:
 
 NOTE: All binaries are in the x86_64 architecture.
 
-## Winodows
+## Windows
 
 Download the LazyUSAR.exe file from the latest release, and double click on it in the file manager to run, it's that simple!
 
